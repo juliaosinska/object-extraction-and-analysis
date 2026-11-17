@@ -1,10 +1,7 @@
 from collections import deque
-
 import numpy as np
 
-# lepiej zaczac od tych bez polaczen - te z polaczeniami bardzo lekkimi moga zostac wykryte przez erozje i naprawione przez dylacje.
-# gorzej z wiekszymi sklejeniami gdzie raczej nie ma przerw miedzy ziarenkami 
-# ofc mozna uzyc czegos innego niz ziarenka 
+# WŁASNE: labeling the detected objects 
 def connected_component_labeling(mask: np.ndarray, connectivity: int = 8):
     binary_mask = (mask > 0).astype(np.uint8) 
 
@@ -47,33 +44,40 @@ def connected_component_labeling(mask: np.ndarray, connectivity: int = 8):
 
     return labels, current_label
 
-
-
-# TODO (WŁASNE): step 1
+# WŁASNE: coloring object labels as groups
 def labels_to_color(labels: np.ndarray, n: int):
-    """
-    labels: H x W, int, 0 = background, 1..n = objects
-    returns: H x W x 3, uint8 - a different color for every object, background black
-    """
-    raise NotImplementedError("labels_to_color (objects_analysis.py)")
+    color_generator = np.random.default_rng(0)
+    size = (n + 1, 3)
+    colors = color_generator.integers(50, 256, size=size)
+    colors = np.array(colors, dtype=np.uint8)
+    colors[0] = 0
 
-# TODO (WŁASNE): step 2
+    return colors[labels]
+
+# WŁASNE: position number = label number, value = how many pixels does this label have
 def compute_areas(labels: np.ndarray, n: int):
-    """
-    returns: 1D array of length n + 1, areas[i] = number of pixels of object i
-             (areas[0] = background, ignored)
-    """
-    raise NotImplementedError("compute_areas (objects_analysis.py)")
+    label_bins = np.bincount(labels.ravel(), minlength=n + 1).astype(np.float64)
 
-# TODO (WŁASNE): step 2
+    return label_bins
+    
+
+# WŁASNE: classifying objects based on their calculated area
 def classify_objects(areas: np.ndarray, eps: float, k: float):
-    """
-    areas: result of compute_areas (index = label, areas[0] ignored)
-    eps:   relative tolerance for single objects
-    k:     threshold coefficient for connected objects (k > 1 + eps)
-    returns: (categories, mean_area)
-             categories - list of length n + 1, categories[i] is "single", "connected" or "other"
-                          (categories[0] ignored)
-             mean_area  - the mean area used for the classification
-    """
-    raise NotImplementedError("classify_objects (objects_analysis.py)")
+    N = len(areas) - 1 # areas[0] is the background
+    categories = ["background"]
+
+    if N == 0:
+        return categories, 0
+    
+    average_area = areas[1:].sum() * (1/N)
+
+    for i in range(1, N + 1):
+        if average_area * (1 - eps) <= areas[i] <= average_area * (1 + eps):
+            categories.append("single")
+        elif areas[i] > k * average_area:
+            categories.append("connected")
+        else:
+            categories.append("other")
+
+    return categories, average_area
+
