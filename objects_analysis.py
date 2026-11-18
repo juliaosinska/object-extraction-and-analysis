@@ -1,7 +1,7 @@
 from collections import deque
 import numpy as np
 
-# WŁASNE: labeling the detected objects 
+# WŁASNE: labeling the detected objects with BFS
 def connected_component_labeling(mask: np.ndarray, connectivity: int = 8):
     binary_mask = (mask > 0).astype(np.uint8) 
 
@@ -55,12 +55,12 @@ def labels_to_color(labels: np.ndarray, n: int):
     return colors[labels]
 
 # WŁASNE: position number = label number, value = how many pixels does this label have
+# logic based on previous histogram calculations
 def compute_areas(labels: np.ndarray, n: int):
     label_bins = np.bincount(labels.ravel(), minlength=n + 1).astype(np.float64)
 
     return label_bins
     
-
 # WŁASNE: classifying objects based on their calculated area
 def classify_objects(areas: np.ndarray, eps: float, k: float):
     N = len(areas) - 1 # areas[0] is the background

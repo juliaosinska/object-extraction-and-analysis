@@ -1,6 +1,7 @@
 import numpy as np
 
 # Code from TASK 4 for image segmentation
+# NOTE: not pasting my own versions (of the optimized ones) again to keep the code cleaner. They can be seen in TASK 4.
 
 # GENAI: Claude - optimized version of own calculate_image_histogram (task 4)
 def optimized_calculate_image_histogram(image: np.ndarray):

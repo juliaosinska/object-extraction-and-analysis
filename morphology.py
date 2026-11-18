@@ -2,6 +2,7 @@ import numpy as np
 
 # Morphological operations from TASK 5 - used for background correction (top-hat)
 # and for cleaning the binary mask (opening / closing)
+# NOTE: not pasting my own versions (of the optimized ones) again to keep the code cleaner. They can be seen in TASK 5.
 
 # WŁASNE: define the structuring element (SE) for morphological operations 
 #           two options: square and disk

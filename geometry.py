@@ -15,9 +15,9 @@ def crop_object(image: np.ndarray, labels: np.ndarray, label: int, margin: int):
 
     # 3. cut out the image fragment and the mask of ONLY this object
     image_object_fragment = image[y_min : y_max + 1, x_min : x_max + 1]
-    mask__object_fragment = object_to_crop[y_min : y_max + 1, x_min : x_max + 1]
+    mask_object_fragment = object_to_crop[y_min : y_max + 1, x_min : x_max + 1]
 
-    return image_object_fragment, mask__object_fragment
+    return image_object_fragment, mask_object_fragment
 
 # WŁASNE: calculating object's orientation
 def object_orientation(mask: np.ndarray):
@@ -41,12 +41,12 @@ def object_orientation(mask: np.ndarray):
     # 5. return θ in degrees
     return np.degrees(theta)
 
-# GENAI: Claude – bilinear interpolation formula from task 5 (corner_background), here for arrays:
-#                 u, v - fractional parts, v_00..v_11 - values of the 4 neighbouring pixels
+# WŁASNE: bilinear interpolation formula copied fro the previous tasks
 def bilinear_formula(u, v, v_00, v_10, v_01, v_11):
     return (1 - u)*(1 - v)*v_00 + u*(1 - v)*v_10 + (1 - u)*v*v_01 + u*v*v_11
 
-# GENAI: Claude - helped with the correct calculations and explaining the logic behind
+# GENAI: Claude - helped with the correct calculations and explaining the logic behind them
+# ESPECIALLY: adjusting the bilinear interpolation logic of the previous task's version to fit this new task
 def rotate_object(image_crop: np.ndarray, mask_crop: np.ndarray, theta: float):
     # 1. angle in radians, cos and sin
     theta = np.radians(theta)
@@ -174,10 +174,8 @@ def shape_descriptors(mask_original: np.ndarray, mask_rotated: np.ndarray):
 
     rectangularity = area / (width * height)
 
-    # perimeter from the ORIGINAL mask - nearest-neighbour rotation makes the edges jagged
     perimeter = contour_perimeter(mask_original)
 
-    # a single pixel has perimeter 0 -> circularity undefined
     circularity = (4 * np.pi * area) / (perimeter ** 2) if perimeter > 0 else np.nan
 
     return {"area" : area,
