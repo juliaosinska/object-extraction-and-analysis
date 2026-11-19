@@ -4,8 +4,13 @@ from morphology import make_structuring_element, opening, closing
 # Code from TASK 5 for background correction and removal
 
 # ------------------------
-# Gaussian blur background estimation 
+# Gaussian blur background estimation
 # ------------------------
+
+# WŁASNE: from previous tasks - image filtering
+# GENAI: Claude – adaptation of my task-3 Gaussian code to 2D grayscale arrays (no uint8 rounding between passes)
+# WŁASNE: adapted to task 5: added size parameter to get_separable_gaussian_kernel()
+#           and gaussian_filter() to allow for different kernel sizes
 
 def get_separable_gaussian_kernel(sigma=1.0, size=3):
     radius = size // 2
@@ -88,7 +93,7 @@ def black_tophat_background(image: np.ndarray, se_shape: str, se_size: int):
 # Preparing R for thresholding
 # ------------------------
 
-# GENAI: Claude for correct use of arrays
+# GENAI: Claude – shifting and clipping R to uint8 0..255 before Otsu
 # R is float and can be negative; Otsu (np.bincount) needs 0..255 -> shift by offset (blur: 128, top-hat: 0) and clip
 def correction_to_uint8(R: np.ndarray, offset: float = 0.0) -> np.ndarray:
     return np.clip(np.round(R + offset), 0, 255).astype(np.uint8)

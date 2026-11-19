@@ -41,7 +41,7 @@ def object_orientation(mask: np.ndarray):
     # 5. return θ in degrees
     return np.degrees(theta)
 
-# WŁASNE: bilinear interpolation formula copied fro the previous tasks
+# WŁASNE: bilinear interpolation formula copied from the previous tasks
 def bilinear_formula(u, v, v_00, v_10, v_01, v_11):
     return (1 - u)*(1 - v)*v_00 + u*(1 - v)*v_10 + (1 - u)*v*v_01 + u*v*v_11
 
