@@ -2,6 +2,8 @@
 
 A small Python desktop app (Tkinter) that finds objects in an image, labels them, classifies them by size, aligns the single objects to a common orientation and describes their shape with geometric descriptors. The binary mask is computed inside the program (thresholding from task 4, optional background correction and morphology from task 5); a ready mask can also be loaded from a file.
 
+Repository: [juliaosinska/object-extraction-and-analysis](https://github.com/juliaosinska/object-extraction-and-analysis)
+
 ## Features
 
 - Load an image (RGB) and, optionally, a binary mask (8-bit: 0 = background, any other value = object, same size as the image)
@@ -82,35 +84,41 @@ Load an image, set the parameters and click *Process Image*; the view is chosen 
 
 - Observations:
     - **Channel**: the grains are yellowish on a white background, so they stand out most in the blue channel (about twice the contrast of the gray image, where blue has the smallest weight). The blue channel gives a much cleaner mask (seeds: 17 objects instead of 65).
-    <img width="1397" height="1267" alt="image" src="https://github.com/user-attachments/assets/dae5dc6e-b0dc-4273-8e66-7e587684960d" />
-    <img width="1395" height="1265" alt="image" src="https://github.com/user-attachments/assets/3739e3ab-3c74-4038-8141-c6cf4e56f475" />
+
+      <img width="1397" height="1267" alt="image" src="https://github.com/user-attachments/assets/dae5dc6e-b0dc-4273-8e66-7e587684960d" />
+      <img width="1395" height="1265" alt="image" src="https://github.com/user-attachments/assets/3739e3ab-3c74-4038-8141-c6cf4e56f475" />
 
     - **4- vs 8-connectivity**: 4-connectivity splits pixels that touch only diagonally, so it gives more objects, almost all of them tiny fragments (rice without cleaning: 43 vs 27). The large objects are nearly the same, and after mask cleaning the difference becomes small.
-    <img width="1399" height="1270" alt="image" src="https://github.com/user-attachments/assets/08d17bf6-4395-480c-a903-e796cf58dc57" />
+
+      <img width="1399" height="1270" alt="image" src="https://github.com/user-attachments/assets/08d17bf6-4395-480c-a903-e796cf58dc57" />
 
     - **Mask cleaning**: opening and closing with a small SE (3) remove the fragments. A larger SE also merges grains that lie close together, because the closing fills the gap between them.
 
     - **Background correction**: necessary for uneven illumination (vignetting image: 803 objects without correction, 59 with it), but harmful for a uniform background: it pulls the grains into the background estimate and leaves mostly their shadows and edges. Top-hat also loses objects larger than the SE. Therefore it is off by default.
-    <img width="1397" height="1265" alt="image" src="https://github.com/user-attachments/assets/a144134a-6b92-46e9-a522-e1ee9f6fe946" />
-    <img width="1397" height="1266" alt="image" src="https://github.com/user-attachments/assets/d2be84b9-1fe4-484a-a6c8-bf85c0d83635" />
+
+      <img width="1397" height="1265" alt="image" src="https://github.com/user-attachments/assets/a144134a-6b92-46e9-a522-e1ee9f6fe946" />
+      <img width="1397" height="1266" alt="image" src="https://github.com/user-attachments/assets/d2be84b9-1fe4-484a-a6c8-bf85c0d83635" />
 
     - **Effect of ε and k**: a larger ε moves more objects into "single", a larger k moves smaller clusters from "connected" to "other". On seeds (similar grains) the result is stable from ε = 0.2. On rice a few large clusters raise the mean to about the area of two grains, so with ε = 0.2 most single grains end up in "other" and a pair of grains is "single". The area-based classification is approximate, because the mean is not robust to a few large objects.
-    <img width="1398" height="1387" alt="image" src="https://github.com/user-attachments/assets/a08747ce-d282-402c-a760-28195d3ee1ca" />
-    <img width="1395" height="1389" alt="image" src="https://github.com/user-attachments/assets/8e38695e-e1da-4bfe-a90a-b5b8be9cf30b" />
-    <img width="1402" height="1393" alt="image" src="https://github.com/user-attachments/assets/5bed3ae9-cea7-46f4-9acb-4fe0f75bf2d0" />
+
+      <img width="1398" height="1387" alt="image" src="https://github.com/user-attachments/assets/a08747ce-d282-402c-a760-28195d3ee1ca" />
+      <img width="1395" height="1389" alt="image" src="https://github.com/user-attachments/assets/8e38695e-e1da-4bfe-a90a-b5b8be9cf30b" />
+      <img width="1402" height="1393" alt="image" src="https://github.com/user-attachments/assets/5bed3ae9-cea7-46f4-9acb-4fe0f75bf2d0" />
 
     - **Orientation**: after the rotation the recomputed angle is close to 0° (below 1.5°), which confirms the alignment. Nearly round objects have a poorly defined main axis.
-    <img width="1398" height="1389" alt="image" src="https://github.com/user-attachments/assets/828f5d63-1a0d-451d-ad75-a0ab3c78dcec" />
+
+      <img width="1398" height="1389" alt="image" src="https://github.com/user-attachments/assets/828f5d63-1a0d-451d-ad75-a0ab3c78dcec" />
 
     - **Shape comparison** (means for objects larger than 200 px):
 
-        | Objects | Circularity | Rectangularity | Aspect ratio |
-        |---|---|---|---|
-        | wheat grains (compact) | 0.73 | 0.74 | 1.87 |
-        | rice grains (elongated) | 0.50 | 0.76 | 2.94 |
-        | rice clusters (irregular) | 0.19 | 0.40 | 1.82 |
+      | Objects | Circularity | Rectangularity | Aspect ratio |
+      |---|---|---|---|
+      | wheat grains (compact) | 0.73 | 0.74 | 1.87 |
+      | rice grains (elongated) | 0.50 | 0.76 | 2.94 |
+      | rice clusters (irregular) | 0.19 | 0.40 | 1.82 |
 
-        Circularity separates compact, elongated and irregular objects; rectangularity drops strongly for clusters; the aspect ratio measures elongation best. The descriptors can tell a cluster from a single object even when their areas are similar.
-        <img width="1396" height="1390" alt="image" src="https://github.com/user-attachments/assets/c37635cd-950d-4c03-a96a-1d0d6bcb97cf" />
+      Circularity separates compact, elongated and irregular objects; rectangularity drops strongly for clusters; the aspect ratio measures elongation best. The descriptors can tell a cluster from a single object even when their areas are similar.
+
+      <img width="1396" height="1390" alt="image" src="https://github.com/user-attachments/assets/c37635cd-950d-4c03-a96a-1d0d6bcb97cf" />
 
     - **Limits**: the contour is built from pixel steps (1 and √2), so even a digital disc has circularity ≈ 0.91, and objects of a few pixels get meaningless values (circularity > 1).
