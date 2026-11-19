@@ -92,7 +92,7 @@ class ObjectAnalysisGUI:
         mask_frame.pack(side=tk.LEFT, padx=5)
         self.channel_var = tk.StringVar(value="Blue")
         self.objects_var = tk.StringVar(value=OBJECTS_DARKER)
-        self.se_size_var = tk.IntVar(value=5)
+        self.se_size_var = tk.IntVar(value=3)
         self.add_combobox(mask_frame, "Channel:", self.channel_var, ["Gray", "Blue"])
         self.add_combobox(mask_frame, "Objects:", self.objects_var, [OBJECTS_DARKER, OBJECTS_BRIGHTER])
         self.add_spinbox(mask_frame, "Cleaning SE (0 = off):", self.se_size_var, 0, 51, 1)
