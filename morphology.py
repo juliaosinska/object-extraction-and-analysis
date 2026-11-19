@@ -2,7 +2,6 @@ import numpy as np
 
 # Morphological operations from TASK 5 - used for background correction (top-hat)
 # and for cleaning the binary mask (opening / closing)
-# NOTE: not pasting my own versions (of the optimized ones) again to keep the code cleaner. They can be seen in TASK 5.
 
 # WŁASNE: define the structuring element (SE) for morphological operations 
 #           two options: square and disk
@@ -20,6 +19,20 @@ def make_structuring_element(shape: str, size: int):
     else:
         raise ValueError("Unsupported structuring element shape. Use 'Square' or 'Disk'.")
 
+# WŁASNE: define erosion based on previous task adaptive thresholding logic (same windowing logic)
+# def erosion(image: np.ndarray, se: np.ndarray):
+#     window_radius = se.shape[0] // 2
+#     padded_image = np.pad(image, window_radius, mode='edge')
+#     eroded = np.zeros(image.shape)
+#     height, width = image.shape
+#
+#     for x in range(height):
+#         for y in range(width):
+#             window = padded_image[x:x + se.shape[0], y:y + se.shape[1]]
+#             eroded[x, y] = np.min(window[se])
+#
+#     return eroded
+
 # GENAI: Claude – optimized erosion: the loop over pixels is replaced with a loop over SE elements
 def optimized_erosion(image: np.ndarray, se: np.ndarray):
     window_radius = se.shape[0] // 2
@@ -32,6 +45,20 @@ def optimized_erosion(image: np.ndarray, se: np.ndarray):
         eroded = np.minimum(eroded, piece_of_image)
 
     return eroded
+
+# WŁASNE: define dilation based on previous task adaptive thresholding logic (same windowing logic)
+# def dilation(image: np.ndarray, se: np.ndarray):
+#     window_radius = se.shape[0] // 2
+#     padded_image = np.pad(image, window_radius, mode='edge')
+#     dilated = np.zeros(image.shape)
+#     height, width = image.shape
+#
+#     for x in range(height):
+#         for y in range(width):
+#             window = padded_image[x:x + se.shape[0], y:y + se.shape[1]]
+#             dilated[x, y] = np.max(window[se])
+#
+#     return dilated
 
 # GENAI: Claude – optimized dilation: same idea as optimized_erosion, with np.maximum
 def optimized_dilation(image: np.ndarray, se: np.ndarray):
